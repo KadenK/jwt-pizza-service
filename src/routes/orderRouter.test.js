@@ -19,7 +19,7 @@ beforeAll(async () => {
 
   const registerUserResp = await request(app).post("/api/auth").send({
     name: "Test User",
-    email: "test@jwt.com",
+    email: "test@example.com",
     password: "user",
   });
 

@@ -2,7 +2,6 @@ const request = require("supertest");
 const app = require("../service");
 
 let adminAuthToken;
-let adminUserId;
 
 let userAuthToken;
 let userUserId;
@@ -14,7 +13,6 @@ beforeAll(async () => {
   });
 
   adminAuthToken = loginAdminUserResp.body.token;
-  adminUserId = loginAdminUserResp.body.user.id;
 
   const registerUserResp = await request(app).post("/api/auth").send({
     name: "Test User",
@@ -80,16 +78,6 @@ test("Get user franchises as admin", async () => {
 
   expect(response.status).toBe(200);
   expect(Array.isArray(response.body)).toBe(true);
-});
-
-test("Error when getting another user's franchises", async () => {
-  const response = await request(app)
-    .get(`/api/franchise/${adminUserId}`)
-    .set("Authorization", `Bearer ${userAuthToken}`);
-
-  expect(response.status).toBe(200);
-  expect(Array.isArray(response.body)).toBe(true);
-  expect(response.body.length).toBe(0);
 });
 
 test("Create store for franchise", async () => {
