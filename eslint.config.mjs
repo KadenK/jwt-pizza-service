@@ -12,10 +12,19 @@ export default defineConfig([
     extends: ["js/recommended"],
     languageOptions: { globals: globals.node },
   },
+  {
+    files: ["**/*.test.js", "**/*.spec.js"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.jest,
+      },
+    },
+  },
   { files: ["**/*.js"], languageOptions: { sourceType: "commonjs" } },
   {
     files: ["**/*.json"],
-    ignores: ["package-lock.json"],
+    ignores: ["package-lock.json", "coverage/**/*.json"],
     plugins: { json },
     language: "json/jsonc",
     extends: ["json/recommended"],
