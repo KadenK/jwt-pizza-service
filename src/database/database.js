@@ -461,7 +461,18 @@ class DB {
           await connection.query(statement);
         }
 
-        if (!dbExists) {
+        const [adminRows] = await connection.execute(
+          `SELECT id FROM user WHERE email=?`,
+          ["a@jwt.com"]
+        );
+        const adminExists = adminRows.length > 0;
+        console.log(
+          adminExists
+            ? "Admin user exists"
+            : "Admin user does not exist, creating it"
+        );
+
+        if (!dbExists || !adminExists) {
           const defaultAdmin = {
             name: "常用名字",
             email: "a@jwt.com",

@@ -57,8 +57,15 @@ test("Register requires password", async () => {
 });
 
 test("Login with existing user", async () => {
+  const registerResp = await request(app).post("/api/auth").send({
+    name: "Test User",
+    email: "existingtest@example.com",
+    password: "password123",
+  });
+  expect(registerResp.status).toBe(200);
+
   const loginResp = await request(app).put("/api/auth").send({
-    email: "test@example.com",
+    email: "existingtest@example.com",
     password: "password123",
   });
 

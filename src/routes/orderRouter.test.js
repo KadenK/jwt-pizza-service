@@ -52,18 +52,6 @@ beforeAll(async () => {
     })
     .set("Authorization", `Bearer ${adminAuthToken}`);
   storeId = createStoreResp.body.id;
-
-  // add a menu item
-  const randomTitle = `Menu Item ${Math.floor(Math.random() * 1000000)}`;
-  await request(app)
-    .put("/api/order/menu")
-    .send({
-      title: randomTitle,
-      description: "A delicious test item",
-      image: "http://example.com/image.png",
-      price: 0.0001,
-    })
-    .set("Authorization", `Bearer ${adminAuthToken}`);
 });
 
 test("Get menu", async () => {
