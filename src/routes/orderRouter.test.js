@@ -2,7 +2,6 @@ const request = require("supertest");
 const app = require("../service");
 
 let adminAuthToken;
-let adminUserId;
 
 let userAuthToken;
 let userUserId;
@@ -17,7 +16,6 @@ beforeAll(async () => {
   });
 
   adminAuthToken = loginAdminUserResp.body.token;
-  adminUserId = loginAdminUserResp.body.user.id;
 
   const registerUserResp = await request(app).post("/api/auth").send({
     name: "Test User",
