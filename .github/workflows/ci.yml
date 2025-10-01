@@ -60,6 +60,7 @@ jobs:
       - name: Seed database
         run: |
           npm run start &
+          sleep 5
           bash generatePizzaData.sh http://localhost:3000
           pkill node
 
