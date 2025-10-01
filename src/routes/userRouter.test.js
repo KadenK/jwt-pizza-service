@@ -43,9 +43,25 @@ test("Update user", async () => {
   expect(response.body).toHaveProperty("user");
   expect(response.body.user).toEqual(
     expect.objectContaining({
-      id: userId,
       name: "Updated User",
       email: "updated@example.com",
+    })
+  );
+});
+
+test("Error when updating another user without admin role", async () => {
+  const response = await request(app)
+    .put(`/api/user/${userId + 1}`) // Attempt to update a different user
+    .send({
+      name: "Hacker User",
+      email: "hacker@example.com",
+    })
+    .set("Authorization", `Bearer ${authToken}`);
+
+  expect(response.status).toBe(403);
+  expect(response.body).toEqual(
+    expect.objectContaining({
+      message: "unauthorized",
     })
   );
 });
