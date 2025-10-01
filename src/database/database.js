@@ -404,7 +404,6 @@ class DB {
   }
 
   async query(connection, sql, params) {
-    console.log("SQL Command:\n", sql, "<br/>");
     const [results] = await connection.execute(sql, params);
     return results;
   }
