@@ -6,13 +6,12 @@
   "scripts": {
     "start": "cd src && node index.js",
     "lint": "eslint .",
-    "test": "jest --coverage"
+    "test": "jest"
   },
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "express": "^4.19.2",
-    "jest": "^30.2.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.9.7"
   },
@@ -22,15 +21,8 @@
     "@eslint/json": "^0.13.2",
     "@eslint/markdown": "^7.3.0",
     "eslint": "^9.36.0",
-    "globals": "^16.4.0"
-  },
-  "jest": {
-    "coverageReporters": [
-      "clover",
-      "json",
-      "lcov",
-      "text",
-      "json-summary"
-    ]
+    "globals": "^16.4.0",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
   }
 }
