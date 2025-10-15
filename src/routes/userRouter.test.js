@@ -86,6 +86,7 @@ test("list users", async () => {
     .set("Authorization", "Bearer " + userToken);
   expect(listUsersRes.status).toBe(200);
   expect(listUsersRes.body).toHaveProperty("users");
+  expect(listUsersRes.body).toHaveProperty("more");
   expect(Array.isArray(listUsersRes.body.users)).toBe(true);
   expect(listUsersRes.body.users.length).toBeGreaterThan(0);
   console.log(listUsersRes.body.users[0]);

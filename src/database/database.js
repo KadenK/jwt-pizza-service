@@ -134,6 +134,12 @@ class DB {
   async listUsers(pageStart = 1, limit = 10, nameFilter = "*") {
     const connection = await this.getConnection();
     try {
+      const countQuery = `SELECT COUNT(*) as total FROM user ${
+        nameFilter === "*" ? "" : `WHERE name LIKE '${nameFilter}'`
+      }`;
+      const countResult = await this.query(connection, countQuery);
+      const totalCount = countResult[0].total;
+
       const users = await this.query(
         connection,
         `SELECT * FROM user ${
@@ -152,10 +158,11 @@ class DB {
         user.roles = roles.map((r) => ({ role: r.role }));
         userResult.push(user);
       }
-      return userResult;
+      const more = pageStart * limit < totalCount;
+      return { users: userResult, more };
     } catch (err) {
       console.log("Error listing users", err);
-      return [];
+      throw new StatusCodeError("unable to list users", 500);
     } finally {
       connection.end();
     }
