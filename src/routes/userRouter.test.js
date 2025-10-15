@@ -89,7 +89,6 @@ test("list users", async () => {
   expect(listUsersRes.body).toHaveProperty("more");
   expect(Array.isArray(listUsersRes.body.users)).toBe(true);
   expect(listUsersRes.body.users.length).toBeGreaterThan(0);
-  console.log(listUsersRes.body.users[0]);
   expect(listUsersRes.body.users[0]).toHaveProperty("id");
   expect(listUsersRes.body.users[0]).toHaveProperty("name");
   expect(listUsersRes.body.users[0]).toHaveProperty("email");
