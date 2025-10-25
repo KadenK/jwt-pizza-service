@@ -72,7 +72,7 @@ test("list users unauthorized", async () => {
 });
 
 test("list users forbidden", async () => {
-  const [user, userToken] = await registerUser(request(app));
+  const [, userToken] = await registerUser(request(app));
   const listUsersRes = await request(app)
     .get("/api/user")
     .set("Authorization", "Bearer " + userToken);
@@ -80,7 +80,7 @@ test("list users forbidden", async () => {
 });
 
 test("list users", async () => {
-  const [user, userToken] = await loginAdmin(request(app));
+  const [, userToken] = await loginAdmin(request(app));
   const listUsersRes = await request(app)
     .get("/api/user")
     .set("Authorization", "Bearer " + userToken);
@@ -101,7 +101,7 @@ test("delete user unauthorized", async () => {
 });
 
 test("delete user forbidden", async () => {
-  const [user, userToken] = await registerUser(request(app));
+  const [, userToken] = await registerUser(request(app));
   const deleteUserRes = await request(app)
     .delete("/api/user/1")
     .set("Authorization", "Bearer " + userToken);
@@ -109,9 +109,9 @@ test("delete user forbidden", async () => {
 });
 
 test("delete user", async () => {
-  const [adminUser, adminToken] = await loginAdmin(request(app));
+  const [, adminToken] = await loginAdmin(request(app));
 
-  const [user, userToken] = await registerUser(request(app));
+  const [user] = await registerUser(request(app));
 
   const deleteOtherUserRes = await request(app)
     .delete(`/api/user/${user.id}`)
