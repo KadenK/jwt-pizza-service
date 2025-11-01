@@ -37,7 +37,7 @@ async function requestTracker(req, res, next) {
   next();
 }
 
-async function pizzaPurchase(status, latency, count, price) {}
+// async function pizzaPurchase(status, latency, count, price) {}
 
 async function sendAllMetrics() {
   // Clean up expired tokens
@@ -77,7 +77,7 @@ async function sendAllMetrics() {
 
 setInterval(() => {
   sendAllMetrics();
-}, 1000);
+}, 4000);
 
 function buildMetric(metricName, metricValue, type, unit) {
   const metric = {
@@ -168,7 +168,7 @@ function removeActiveToken(token) {
 
 module.exports = {
   requestTracker,
-  pizzaPurchase,
+  // pizzaPurchase,
   addActiveToken,
   removeActiveToken,
 };
