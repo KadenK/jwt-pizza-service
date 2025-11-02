@@ -12,9 +12,16 @@ let authSuccessCount = 0;
 let authFailureCount = 0;
 let activeTokens = new Map();
 
+let latencies = [];
+
+let pizzasSold = 0;
+let creationFailures = 0;
+let totalRevenue = 0;
+
 async function requestTracker(req, res, next) {
   const method = req.method.toLowerCase();
   const originalPath = req.path;
+  const startTime = Date.now();
   if (requestCounts[method] !== undefined) {
     totalRequests++;
     requestCounts[method]++;
@@ -32,12 +39,22 @@ async function requestTracker(req, res, next) {
         }
       }
     }
+    const latency = Date.now() - startTime;
+    latencies.push(buildMetric("request_latency", latency, "gauge", "ms"));
   });
 
   next();
 }
 
-// async function pizzaPurchase(status, latency, count, price) {}
+async function pizzaPurchase(status, latency, count, price) {
+  latencies.push(buildMetric("pizza_purchase_latency", latency, "gauge", "ms"));
+  if (status === "success") {
+    pizzasSold += count;
+    totalRevenue += price;
+  } else if (status === "failure") {
+    creationFailures++;
+  }
+}
 
 async function sendAllMetrics() {
   // Clean up expired tokens
@@ -71,6 +88,17 @@ async function sendAllMetrics() {
     buildMetric("active_tokens_count", activeTokens.size, "gauge", "1")
   );
 
+  // Build latency metrics
+  metrics.push(...latencies);
+  latencies = [];
+
+  // Build pizza sales metrics
+  metrics.push(buildMetric("pizzas_sold_total", pizzasSold, "sum", "1"));
+  metrics.push(
+    buildMetric("pizza_creation_failures_total", creationFailures, "sum", "1")
+  );
+  metrics.push(buildMetric("revenue_total", totalRevenue, "sum", "1"));
+
   // Send all metrics to Grafana
   sendMetricsToGrafana(metrics);
 }
@@ -86,7 +114,7 @@ function buildMetric(metricName, metricValue, type, unit) {
     [type]: {
       dataPoints: [
         {
-          [type === "gauge" ? "asDouble" : "asInt"]: metricValue,
+          asDouble: metricValue,
           timeUnixNano: Date.now() * 1000000,
           attributes: [
             {
@@ -159,7 +187,7 @@ function getMemoryUsagePercentage() {
 }
 
 function addActiveToken(token) {
-  activeTokens.set(token, Date.now() + 2 * 60 * 60 * 1000);
+  activeTokens.set(token, Date.now() + 2 * 60 * 60 * 1000); // 2 hours expiration
 }
 
 function removeActiveToken(token) {
@@ -168,7 +196,7 @@ function removeActiveToken(token) {
 
 module.exports = {
   requestTracker,
-  // pizzaPurchase,
+  pizzaPurchase,
   addActiveToken,
   removeActiveToken,
 };
