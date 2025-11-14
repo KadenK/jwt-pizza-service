@@ -6,11 +6,13 @@ const userRouter = require("./routes/userRouter.js");
 const metrics = require("./metrics.js");
 const version = require("./version.json");
 const config = require("./config.js");
+const logger = require("./logger.js");
 
 const app = express();
 app.use(express.json());
 app.use(setAuthUser);
 app.use(metrics.requestTracker);
+app.use(logger.httpLogger);
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
@@ -57,6 +59,10 @@ app.use((err, req, res, next) => {
   res
     .status(err.statusCode ?? 500)
     .json({ message: err.message, stack: err.stack });
+  logger.log("error", "exception", {
+    req: JSON.stringify(req.body),
+    res: JSON.stringify({ message: err.message, stack: err.stack }),
+  });
   next();
 });
 

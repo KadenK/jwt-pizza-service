@@ -4,6 +4,7 @@ const { Role, DB } = require("../database/database.js");
 const { authRouter } = require("./authRouter.js");
 const { asyncHandler, StatusCodeError } = require("../endpointHelper.js");
 const { pizzaPurchase } = require("../metrics.js");
+const logger = require("../logger.js");
 
 const orderRouter = express.Router();
 
@@ -117,19 +118,24 @@ orderRouter.post(
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
     const startTime = Date.now();
+    const reqBody = JSON.stringify({
+      diner: { id: req.user.id, name: req.user.name, email: req.user.email },
+      order,
+    });
     const r = await fetch(`${config.factory.url}/api/order`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         authorization: `Bearer ${config.factory.apiKey}`,
       },
-      body: JSON.stringify({
-        diner: { id: req.user.id, name: req.user.name, email: req.user.email },
-        order,
-      }),
+      body: reqBody,
     });
     const j = await r.json();
     if (r.ok) {
+      logger.log("info", "factory", {
+        req: reqBody,
+        res: JSON.stringify(j),
+      });
       res.send({ order, followLinkToEndChaos: j.reportUrl, jwt: j.jwt });
       const latency = Date.now() - startTime;
       pizzaPurchase(
@@ -139,13 +145,15 @@ orderRouter.post(
         order.items.reduce((sum, item) => sum + item.price, 0)
       );
     } else {
+      logger.log("error", "factory", {
+        req: reqBody,
+        res: JSON.stringify(j),
+      });
       await DB.deleteOrder(order.id); // Rollback order on failure
-      res
-        .status(500)
-        .send({
-          message: "Failed to fulfill order at factory",
-          followLinkToEndChaos: j.reportUrl,
-        });
+      res.status(500).send({
+        message: "Failed to fulfill order at factory",
+        followLinkToEndChaos: j.reportUrl,
+      });
       const latency = Date.now() - startTime;
       pizzaPurchase("failure", latency, order.items.length, 0);
     }
