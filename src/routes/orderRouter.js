@@ -169,7 +169,6 @@ orderRouter.post(
         req: reqBody,
         res: JSON.stringify(j),
       });
-      await DB.deleteOrder(order.id); // Rollback order on failure
       res.status(500).send({
         message: "Failed to fulfill order at factory",
         followLinkToEndChaos: j.reportUrl,
